@@ -1,10 +1,13 @@
 package com.appyware.filters;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends ActionBarActivity {
+
+    Drawable[] layers = new Drawable[2];
 
     String imgPath1;
     int prog, width, height;
@@ -118,20 +123,32 @@ public class MainActivity extends ActionBarActivity {
 
 		/* Decode the JPEG file into a Bitmap */
         bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+
         /* Associate the Bitmap to the ImageView */
-        imageView.setImageBitmap(bitmap);
-        imageView1.setImageBitmap(bitmap);
+        //imageView.setImageBitmap(bitmap);
+        //imageView1.setImageBitmap(bitmap);
+
+        Resources r = getResources();
+        Drawable d = new BitmapDrawable(getResources(), bitmap);
+        layers[0] = d;
+        layers[1] = r.getDrawable(R.drawable.filred);
+        LayerDrawable layerDrawable = new LayerDrawable(layers);
+        imageView.setImageDrawable(layerDrawable);
 
         imageView.setVisibility(View.VISIBLE);
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
+        /*BitmapDrawable bitmapDrawable = (BitmapDrawable) imageView.getDrawable();
+
         bitmap1 = bitmapDrawable.getBitmap();
         filterBitmap = Bitmap.createBitmap(bitmap1.getWidth(),
                 bitmap1.getHeight(), bitmap1.getConfig());
         height = bitmap1.getHeight();
-        width = bitmap1.getWidth();
+        width = bitmap1.getWidth();*/
         linearLayout.setVisibility(View.VISIBLE);
         linearLayout1.setVisibility(View.VISIBLE);
         linearLayout2.setVisibility(View.VISIBLE);
+
+
 
     }
 
@@ -176,7 +193,7 @@ public class MainActivity extends ActionBarActivity {
     /* Function to apply effect to bitmap */
     public void applyeffect(View view, int progress) {
 
-        for (int i = 0; i < width; i++) {
+        /*for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int p = bitmap1.getPixel(i, j);
                 int r = Color.red(p);
@@ -192,13 +209,14 @@ public class MainActivity extends ActionBarActivity {
                 filterBitmap.setPixel(i, j, Color.argb(alpha, r, g, b));
             }
         }
-        imageView.setImageBitmap(filterBitmap);
+        imageView.setImageBitmap(filterBitmap);*/
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         seekBar = (SeekBar) findViewById(R.id.seekBar);
         imageView = (ImageView) findViewById(R.id.pic);
@@ -219,12 +237,15 @@ public class MainActivity extends ActionBarActivity {
             mAlbumStorageDirFactory = new BaseAlbumDirFactory();
         }
 
+        seekBar.setMax(255);
+
         /* To check seek bar value when moved */
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                prog = progress;
+               // prog = progress;
+                layers[1].setAlpha(progress);
             }
 
             @Override
@@ -236,8 +257,8 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
-                View v = null;
-                applyeffect(v, prog);
+                //View v = null;
+               // applyeffect(v, prog);
 
             }
         });
